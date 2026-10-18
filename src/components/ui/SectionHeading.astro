@@ -1,0 +1,100 @@
+---
+export interface Props {
+  badge?: string;
+  title: string;
+  subtitle?: string;
+  align?: 'left' | 'center' | 'right';
+  titleTag?: 'h1' | 'h2' | 'h3' | 'h4';
+  colorScheme?: 'light' | 'dark';
+  class?: string;
+}
+
+const {
+  badge,
+  title,
+  subtitle,
+  align = 'center',
+  titleTag = 'h2',
+  colorScheme = 'dark',
+  class: className = '',
+} = Astro.props;
+
+const HeadingTag = titleTag;
+---
+
+<header class:list={['section-heading', `align-${align}`, `scheme-${colorScheme}`, className]}>
+  {badge && <span class="badge">{badge}</span>}
+  <HeadingTag class="title">{title}</HeadingTag>
+  {subtitle && <p class="subtitle lead">{subtitle}</p>}
+  <slot />
+</header>
+
+<style>
+  .section-heading {
+    margin-bottom: var(--space-8);
+  }
+
+  .align-center {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 760px;
+  }
+
+  .align-left {
+    text-align: left;
+    max-width: 760px;
+  }
+
+  .align-right {
+    text-align: right;
+    margin-left: auto;
+    max-width: 760px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.85rem;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-primary);
+    color: var(--color-pine-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .title {
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-3);
+    line-height: var(--line-height-heading);
+  }
+
+  .subtitle {
+    margin-bottom: 0;
+    line-height: var(--line-height-relaxed);
+  }
+
+  .scheme-light .badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .scheme-light .title {
+    color: #ffffff;
+  }
+
+  .scheme-light .subtitle {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .scheme-dark .title {
+    color: var(--color-pine-dark);
+  }
+
+  .scheme-dark .subtitle {
+    color: var(--color-text-muted);
+  }
+</style>

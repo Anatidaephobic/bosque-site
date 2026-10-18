@@ -1,0 +1,86 @@
+---
+export interface Props {
+  shape: 'wavy-hero' | 'origins-teal' | 'origins-sage' | 'rainy' | 'origins-pricing' | 'floats' | string;
+  position?: 'top' | 'bottom';
+  flipX?: boolean;
+  flipY?: boolean;
+  height?: string;
+  class?: string;
+}
+
+const {
+  shape,
+  position = 'bottom',
+  flipX = false,
+  flipY = false,
+  height = '80px',
+  class: className = '',
+} = Astro.props;
+
+const shapeMap: Record<string, string> = {
+  'wavy-hero': '/shapes/shape-wavy-01-001.svg',
+  'origins-teal': '/shapes/shape-origins-14-001-c3-114B5F.svg',
+  'origins-sage': '/shapes/shape-origins-14-001-c3-BEDCC2.svg',
+  'rainy': '/shapes/shape-rainy-10.svg',
+  'origins-pricing': '/shapes/shape-origins-11-001.svg',
+  'floats': '/shapes/shape-floats-04.svg',
+};
+
+const shapeSrc = shapeMap[shape] || shape;
+
+const transformStyle = [
+  flipX ? 'scaleX(-1)' : '',
+  flipY ? 'scaleY(-1)' : '',
+].filter(Boolean).join(' ');
+---
+
+<div
+  class:list={['shape-divider', `position-${position}`, className]}
+  style={{ '--divider-height': height }}
+  aria-hidden="true"
+>
+  <img
+    src={shapeSrc}
+    alt=""
+    class="shape-img"
+    style={transformStyle ? { transform: transformStyle } : undefined}
+    loading="eager"
+    decoding="async"
+  />
+</div>
+
+<style>
+  .shape-divider {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: var(--divider-height, 80px);
+    overflow: hidden;
+    line-height: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .position-top {
+    top: 0;
+  }
+
+  .position-bottom {
+    bottom: -1px;
+  }
+
+  .shape-img {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+
+  @media (min-width: 768px) {
+    .shape-divider {
+      height: calc(var(--divider-height, 80px) * 1.35);
+    }
+  }
+</style>

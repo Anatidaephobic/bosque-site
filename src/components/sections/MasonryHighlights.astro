@@ -1,0 +1,253 @@
+---
+export interface HighlightCard {
+  title: string;
+  description: string;
+  colorScheme?: 'cc-2' | 'cc-3' | 'cc-4' | 'cc-5';
+}
+
+export interface Props {
+  photoSrc?: string;
+  photoAlt?: string;
+  cards?: HighlightCard[];
+  ctaText?: string;
+  ctaHref?: string;
+  class?: string;
+}
+
+const {
+  photoSrc = '/images/home-masonry-casa-bosque-thumb.jpg',
+  photoAlt = 'Casa do Bosque iluminada ao anoitecer',
+  cards = [
+    {
+      title: 'A Cabana',
+      description: 'Casa de dois andares com área para churrasco, cercado pela natureza. Equipada com todos os utensílios necessários e ar condicionado split.',
+      colorScheme: 'cc-2',
+    },
+    {
+      title: 'O Rio',
+      description: 'Local a alguns minutos de distância do Fervedor, ponto turístico do Rio dos Sinos. Próprio para banho e trilhas aquáticas.',
+      colorScheme: 'cc-3',
+    },
+    {
+      title: 'A Natureza',
+      description: 'Estamos cercados por reservas de mata atlântica, com fauna e flora autêntica do bioma. Amplas oportunidades para se reconectar.',
+      colorScheme: 'cc-4',
+    },
+    {
+      title: 'As Trilhas',
+      description: 'As terras da região proporcionam inúmeras oportunidades de trilha e exploração, de inúmeras distâncias e dificuldades.',
+      colorScheme: 'cc-2',
+    },
+  ],
+  ctaText = 'Mais Informações e Fotos',
+  ctaHref = '/info',
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['masonry-highlights-section', className]}>
+  <!-- Background floating particles -->
+  <div class="floats-bg" aria-hidden="true">
+    <img src="/shapes/shape-floats-04.svg" alt="" class="floats-img" />
+  </div>
+
+  <div class="container masonry-container">
+    <div class="masonry-layout">
+      <!-- Photo Circular Column -->
+      <div class="photo-column reveal-on-scroll">
+        <div class="photo-circle-wrapper">
+          <img src={photoSrc} alt={photoAlt} class="photo-circle" loading="eager" />
+        </div>
+      </div>
+
+      <!-- Cards Grid Column -->
+      <div class="cards-column">
+        <div class="cards-grid">
+          {
+            cards.map((card, index) => (
+              <article
+                class:list={['highlight-card', card.colorScheme || 'cc-2', 'reveal-on-scroll']}
+                style={{ transitionDelay: `${index * 80}ms` }}
+              >
+                <h3 class="card-title">{card.title}</h3>
+                <p class="card-desc">{card.description}</p>
+              </article>
+            ))
+          }
+
+          <!-- CTA Card -->
+          <div class="cta-full-card cc-5 reveal-on-scroll">
+            <a href={ctaHref} class="cta-card-link">
+              <span class="cta-label">{ctaText}</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .masonry-highlights-section {
+    position: relative;
+    padding-top: var(--space-20);
+    padding-bottom: var(--space-20);
+    background-color: #5E9E42; /* Vibrant leaf green background matching original */
+    overflow: hidden;
+  }
+
+  .floats-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    z-index: 1;
+  }
+
+  .floats-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .masonry-container {
+    position: relative;
+    z-index: 2;
+  }
+
+  .masonry-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    align-items: center;
+  }
+
+  @media (min-width: 992px) {
+    .masonry-layout {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-12);
+    }
+  }
+
+  .photo-column {
+    display: flex;
+    justify-content: center;
+  }
+
+  .photo-circle-wrapper {
+    width: min(85vw, 440px);
+    height: min(85vw, 440px);
+    border-radius: 50%;
+    padding: 6px;
+    background-color: #ffffff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transition: transform var(--transition-slow);
+  }
+
+  .photo-circle-wrapper:hover {
+    transform: scale(1.02);
+  }
+
+  .photo-circle {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 600px) {
+    .cards-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .highlight-card {
+    padding: var(--space-6);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  }
+
+  .highlight-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .highlight-card.cc-2 {
+    background-color: #f1f5f0;
+    color: #212529;
+  }
+  .highlight-card.cc-2 .card-title {
+    color: #1c2e14;
+  }
+
+  .highlight-card.cc-3 {
+    background-color: #114B5F;
+    color: #ffffff;
+  }
+  .highlight-card.cc-3 .card-title {
+    color: #ffffff;
+  }
+
+  .highlight-card.cc-4 {
+    background-color: #4C7C37;
+    color: #ffffff;
+  }
+  .highlight-card.cc-4 .card-title {
+    color: #ffffff;
+  }
+
+  .card-title {
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-2);
+  }
+
+  .card-desc {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: 0;
+  }
+
+  .cta-full-card {
+    grid-column: 1 / -1;
+    border-radius: var(--radius-sm);
+    padding: var(--space-4) var(--space-6);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+    background-color: #1c2e14;
+    transition: transform var(--transition-normal);
+    text-align: center;
+  }
+
+  .cta-full-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .cta-card-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: #ffffff !important;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: gap var(--transition-fast);
+  }
+
+  .cta-card-link:hover {
+    gap: 0.75rem;
+  }
+</style>

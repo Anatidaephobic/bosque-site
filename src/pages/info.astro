@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TitleBanner from '../components/sections/TitleBanner.astro';
+import TextImage from '../components/sections/TextImage.astro';
+import Carousel from '../components/sections/Carousel.astro';
+import { infoPageData } from '../data/info';
+
+const {
+  meta,
+  titleBanner,
+  cabinSection,
+  cabinGallery,
+  natureSection,
+  natureGallery,
+  nightsSection,
+  productsSection,
+} = infoPageData;
+---
+
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  currentPath="/info"
+>
+  <!-- 1. Title Banner (Parallax Header) -->
+  <TitleBanner
+    title={titleBanner.title}
+    subtitle={titleBanner.subtitle}
+    bgImage={titleBanner.bgImage}
+    bgParallax={titleBanner.bgParallax}
+    overlayOpacity={titleBanner.overlayOpacity}
+    height={titleBanner.height}
+  />
+
+  <!-- 2. A Casa do Bosque (Text Left, Image Right) -->
+  <TextImage
+    title={cabinSection.title}
+    content={cabinSection.content}
+    imageSrc={cabinSection.imageSrc}
+    imageAlt={cabinSection.imageAlt}
+    imagePosition={cabinSection.imagePosition}
+    hasShapeMask={cabinSection.hasShapeMask}
+    background={cabinSection.background}
+    cta={cabinSection.cta}
+  />
+
+  <!-- 3. Cabin Photo Slideshow Carousel (6 Photos) -->
+  <Carousel
+    id={cabinGallery.id}
+    images={cabinGallery.images}
+    height={cabinGallery.height}
+    mobileHeight={cabinGallery.mobileHeight}
+    showThumbnails={cabinGallery.showThumbnails}
+    autoplay={cabinGallery.autoplay}
+  />
+
+  <!-- 4. O Bosque (Image Left with Organic Mask, Text Right) -->
+  <TextImage
+    title={natureSection.title}
+    content={natureSection.content}
+    imageSrc={natureSection.imageSrc}
+    imageAlt={natureSection.imageAlt}
+    imagePosition={natureSection.imagePosition}
+    hasShapeMask={natureSection.hasShapeMask}
+    background={natureSection.background}
+    cta={natureSection.cta}
+  />
+
+  <!-- 5. Nature & River Photo Slideshow Carousel (15 Photos) -->
+  <Carousel
+    id={natureGallery.id}
+    images={natureGallery.images}
+    height={natureGallery.height}
+    mobileHeight={natureGallery.mobileHeight}
+    showThumbnails={natureGallery.showThumbnails}
+    autoplay={natureGallery.autoplay}
+  />
+
+  <!-- 6. As noites (Text Left, Celestial Night Sky Right with Organic Mask) -->
+  <TextImage
+    title={nightsSection.title}
+    content={nightsSection.content}
+    imageSrc={nightsSection.imageSrc}
+    imageAlt={nightsSection.imageAlt}
+    imagePosition={nightsSection.imagePosition}
+    hasShapeMask={nightsSection.hasShapeMask}
+    background={nightsSection.background}
+    cta={nightsSection.cta}
+  />
+
+  <!-- 7. Nossos Produtos (Artisanal Products Left, Text Right) -->
+  <TextImage
+    title={productsSection.title}
+    content={productsSection.content}
+    imageSrc={productsSection.imageSrc}
+    imageAlt={productsSection.imageAlt}
+    imagePosition={productsSection.imagePosition}
+    hasShapeMask={productsSection.hasShapeMask}
+    background={productsSection.background}
+    cta={productsSection.cta}
+  />
+</BaseLayout>

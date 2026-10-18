@@ -1,0 +1,307 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import ShapeDivider from './ShapeDivider.astro';
+
+export interface FeatureItem {
+  title: string;
+  description: string;
+  icon?: string;
+  image?: string;
+  badge?: string;
+  link?: {
+    label: string;
+    href: string;
+  };
+}
+
+export interface Props {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  features: FeatureItem[];
+  columns?: 2 | 3 | 4;
+  background?: 'cc-1' | 'cc-2' | 'cc-3' | 'cc-4' | 'cc-5' | string;
+  showTopWave?: boolean;
+  waveShape?: 'origins-teal' | 'origins-sage';
+  class?: string;
+}
+
+const {
+  badge,
+  title,
+  subtitle,
+  features,
+  columns = 3,
+  background = 'cc-2',
+  showTopWave = false,
+  waveShape = 'origins-teal',
+  class: className = '',
+} = Astro.props;
+
+const bgClass = background.startsWith('cc-') ? background : '';
+const customBgStyle = !background.startsWith('cc-') ? { backgroundColor: background } : undefined;
+---
+
+<section class:list={['features-section', bgClass, className]} style={customBgStyle}>
+  {showTopWave && <ShapeDivider shape={waveShape} position="top" height="60px" />}
+
+  <div class="container">
+    {
+      (title || badge) && (
+        <SectionHeading
+          badge={badge}
+          title={title || ''}
+          subtitle={subtitle}
+          colorScheme={background === 'cc-3' || background === 'cc-5' ? 'light' : 'dark'}
+          class="reveal-on-scroll"
+        />
+      )
+    }
+
+    <div class:list={['features-grid', `cols-${columns}`, { 'blob-grid': background === 'cc-3' }]}>
+      {
+        features.map((item, index) => (
+          <article
+            class:list={[
+              'feature-card',
+              background === 'cc-3' ? ['blob-card', `blob-${index % 3}`] : '',
+              'reveal-on-scroll',
+            ]}
+            style={{ transitionDelay: `${index * 80}ms` }}
+          >
+            {item.image && background !== 'cc-3' && (
+              <div class="feature-media-wrapper">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  class="feature-illustration"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            {item.icon && background !== 'cc-3' && (
+              <div class="feature-icon-wrapper">
+                <span class="feature-icon">{item.icon}</span>
+              </div>
+            )}
+
+            <div class="feature-body">
+              {item.badge && <span class="feature-badge">{item.badge}</span>}
+              <h3 class="feature-title">{item.title}</h3>
+              {item.title === 'Café' && item.link ? (
+                <p class="feature-description">
+                  Serviço <a href={item.link.href} class="cafe-inline-link">incluso*</a> à estadia, preparado toda manhã com produtos da região.
+                </p>
+              ) : (
+                <p class="feature-description">{item.description}</p>
+              )}
+
+              {item.link && background !== 'cc-3' && (
+                <div class="feature-action">
+                  <a href={item.link.href} class="feature-link">
+                    {item.link.label}
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </a>
+                </div>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .features-section {
+    position: relative;
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-20);
+    overflow: hidden;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 680px) {
+    .features-grid.cols-2,
+    .features-grid.cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .features-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .features-grid.cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .feature-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-card);
+    padding: var(--space-8) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Organic Blob Cards (Home Section) */
+  .features-grid.blob-grid {
+    align-items: stretch;
+    gap: var(--space-8);
+  }
+
+  .feature-card.blob-card {
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 3.5rem 2.25rem;
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    border: none;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  }
+
+  .feature-card.blob-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .feature-card.blob-card.blob-0 {
+    background-color: #68B248; /* Foliage green blob */
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+
+  .feature-card.blob-card.blob-1 {
+    background-color: #5A5D8A; /* Slate purple-blue blob */
+    border-radius: 50% 50% 45% 55% / 60% 55% 45% 40%;
+  }
+
+  .feature-card.blob-card.blob-2 {
+    background-color: #183416; /* Deep dark pine blob */
+    border-radius: 55% 45% 50% 50% / 40% 60% 40% 60%;
+  }
+
+  .feature-card.blob-card .feature-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .feature-card.blob-card .feature-title {
+    color: #ffffff;
+    font-size: 1.85rem;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 0.85rem;
+  }
+
+  .feature-card.blob-card .feature-description {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+
+  .feature-card.blob-card .cafe-inline-link {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: var(--font-weight-semibold);
+    transition: opacity var(--transition-fast);
+  }
+
+  .feature-card.blob-card .cafe-inline-link:hover {
+    opacity: 0.85;
+  }
+
+  .feature-media-wrapper {
+    margin-bottom: var(--space-6);
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .feature-illustration {
+    max-height: 130px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .feature-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-neutral-light);
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+    font-size: 1.75rem;
+  }
+
+  .feature-badge {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--font-size-h4);
+    color: var(--color-pine-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .feature-description {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--space-4);
+    flex-grow: 1;
+  }
+
+  .feature-action {
+    margin-top: auto;
+  }
+
+  .feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: gap var(--transition-fast), color var(--transition-fast);
+  }
+
+  .feature-link:hover {
+    color: var(--color-primary-hover);
+    gap: 0.6rem;
+  }
+</style>

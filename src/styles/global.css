@@ -1,0 +1,351 @@
+@import "./tokens.css";
+
+/* ==========================================================================
+   CSS Modern Reset
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-family-sans);
+  font-size: 16px;
+  line-height: var(--line-height-body);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+main > :last-child {
+  flex-grow: 1;
+}
+
+/* ==========================================================================
+   Base Typography
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading);
+  color: inherit;
+  margin-bottom: 0.5em;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--font-size-h1); }
+h2 { font-size: var(--font-size-h2); }
+h3 { font-size: var(--font-size-h3); }
+h4 { font-size: var(--font-size-h4); }
+h5 { font-size: var(--font-size-h5); }
+h6 { font-size: var(--font-size-h6); }
+
+.display-1 { font-size: var(--font-size-display-1); line-height: var(--line-height-tight); }
+.display-2 { font-size: var(--font-size-display-2); line-height: var(--line-height-tight); }
+.display-3 { font-size: var(--font-size-display-3); line-height: var(--line-height-tight); }
+.display-4 { font-size: var(--font-size-display-4); line-height: var(--line-height-tight); }
+
+p {
+  margin-bottom: 1rem;
+  line-height: var(--line-height-relaxed);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.lead {
+  font-size: var(--font-size-lead);
+  font-weight: var(--font-weight-light);
+  line-height: 1.6;
+}
+
+small, .text-sm {
+  font-size: var(--font-size-small);
+}
+
+.text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+img, picture, svg, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ==========================================================================
+   Layout Containers
+   ========================================================================== */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.container-wide {
+  width: 100%;
+  max-width: var(--container-wide-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 840px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* ==========================================================================
+   Color Combinations (Odoo CC Matrix)
+   ========================================================================== */
+.cc-1 {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+.cc-1 h1, .cc-1 h2, .cc-1 h3, .cc-1 h4, .cc-1 h5, .cc-1 h6 {
+  color: var(--color-text);
+}
+
+.cc-2 {
+  background-color: var(--color-neutral-light);
+  color: var(--color-text);
+}
+.cc-2 h1, .cc-2 h2, .cc-2 h3, .cc-2 h4, .cc-2 h5, .cc-2 h6 {
+  color: var(--color-pine-dark);
+}
+
+.cc-3 {
+  background-color: var(--color-secondary);
+  color: var(--color-text-light);
+}
+.cc-3 h1, .cc-3 h2, .cc-3 h3, .cc-3 h4, .cc-3 h5, .cc-3 h6 {
+  color: var(--color-text-light);
+}
+.cc-3 a:not(.btn) {
+  color: #B6D8A7;
+}
+
+.cc-4 {
+  background-color: var(--color-primary);
+  color: var(--color-neutral-light);
+}
+.cc-4 h1, .cc-4 h2, .cc-4 h3, .cc-4 h4, .cc-4 h5, .cc-4 h6 {
+  color: var(--color-neutral-light);
+}
+.cc-4 a:not(.btn) {
+  color: var(--color-surface);
+}
+
+.cc-5 {
+  background-color: var(--color-pine-dark);
+  color: var(--color-neutral-light);
+}
+.cc-5 h1, .cc-5 h2, .cc-5 h3, .cc-5 h4, .cc-5 h5, .cc-5 h6 {
+  color: var(--color-surface);
+}
+.cc-5 a:not(.btn) {
+  color: #B6D8A7;
+}
+
+/* ==========================================================================
+   Buttons (Pill style matching original Odoo design)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  text-decoration: none;
+  padding: 0.55rem 1.45rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(108, 177, 79, 0.35);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text-light);
+  border-color: var(--color-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
+  color: var(--color-text-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(17, 75, 95, 0.35);
+}
+
+.btn-light {
+  background-color: var(--color-surface);
+  color: var(--color-pine-dark);
+  border-color: var(--color-surface);
+}
+
+.btn-light:hover {
+  background-color: var(--color-neutral-light);
+  border-color: var(--color-neutral-light);
+  color: var(--color-pine-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: currentColor;
+  border-color: currentColor;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-sm {
+  font-size: var(--font-size-xs);
+  padding: 0.35rem 0.95rem;
+}
+
+.btn-lg {
+  font-size: 1.125rem;
+  padding: 0.75rem 2.0rem;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* ==========================================================================
+   Cards & Surfaces
+   ========================================================================== */
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ==========================================================================
+   Scroll-driven Animation / Fade-in Reveal
+   ========================================================================== */
+.js .reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Accessibility helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

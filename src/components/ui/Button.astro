@@ -1,0 +1,45 @@
+---
+export interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'light' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+  target?: string;
+  rel?: string;
+  type?: 'button' | 'submit' | 'reset';
+  fullWidth?: boolean;
+  [key: string]: any;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  class: className = '',
+  target,
+  rel,
+  type = 'button',
+  fullWidth = false,
+  ...rest
+} = Astro.props;
+
+const variantClass = `btn-${variant}`;
+const sizeClass = size === 'sm' ? 'btn-sm' : size === 'lg' ? 'btn-lg' : '';
+const fullWidthClass = fullWidth ? 'btn-block' : '';
+const classes = ['btn', variantClass, sizeClass, fullWidthClass, className].filter(Boolean).join(' ');
+
+// Set safe rel attribute if target="_blank"
+const computedRel = target === '_blank' ? (rel || 'noopener noreferrer') : rel;
+---
+
+{
+  href ? (
+    <a href={href} class={classes} target={target} rel={computedRel} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}

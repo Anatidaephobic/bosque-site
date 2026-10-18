@@ -1,0 +1,98 @@
+---
+export interface Props {
+  title: string;
+  subtitle?: string;
+  bgImage?: string;
+  bgParallax?: boolean;
+  background?: 'cc-1' | 'cc-2' | 'cc-3' | 'cc-4' | 'cc-5' | string;
+  overlayOpacity?: number;
+  height?: string;
+  class?: string;
+}
+
+const {
+  title,
+  subtitle,
+  bgImage,
+  bgParallax = true,
+  background = 'cc-3',
+  overlayOpacity = 0.5,
+  height = '280px',
+  class: className = '',
+} = Astro.props;
+
+const bgClass = background.startsWith('cc-') ? background : '';
+const customBgStyle = !background.startsWith('cc-') ? { backgroundColor: background } : undefined;
+---
+
+<section
+  class:list={['title-banner', bgClass, { 'has-parallax': bgParallax && bgImage }, className]}
+  style={{
+    '--banner-height': height,
+    '--banner-bg': bgImage ? `url('${bgImage}')` : 'none',
+    '--overlay-opacity': overlayOpacity.toString(),
+    ...customBgStyle,
+  }}
+>
+  {bgImage && <div class="banner-overlay" />}
+
+  <div class="container banner-container">
+    <div class="banner-content reveal-on-scroll">
+      <h1 class="banner-title display-3">{title}</h1>
+      {subtitle && <p class="banner-subtitle lead">{subtitle}</p>}
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .title-banner {
+    position: relative;
+    min-height: var(--banner-height, 280px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: var(--banner-bg);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-12);
+    text-align: center;
+  }
+
+  @media (min-width: 992px) {
+    .title-banner.has-parallax {
+      background-attachment: fixed;
+    }
+  }
+
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, var(--overlay-opacity, 0.5));
+    z-index: 1;
+  }
+
+  .banner-container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+  }
+
+  .banner-content {
+    max-width: 800px;
+  }
+
+  .banner-title {
+    color: var(--color-surface);
+    margin-bottom: var(--space-2);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .banner-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0;
+  }
+</style>

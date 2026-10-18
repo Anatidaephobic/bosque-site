@@ -1,0 +1,351 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface GalleryItem {
+  src: string;
+  alt: string;
+  caption?: string;
+  aspectRatio?: 'landscape' | 'portrait' | 'square';
+}
+
+export interface Props {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  images: GalleryItem[];
+  layout?: 'grid' | 'masonry';
+  columns?: 2 | 3 | 4;
+  background?: 'cc-1' | 'cc-2' | 'cc-3' | 'cc-4' | 'cc-5' | string;
+  class?: string;
+}
+
+const {
+  badge,
+  title,
+  subtitle,
+  images,
+  layout = 'grid',
+  columns = 3,
+  background = 'cc-1',
+  class: className = '',
+} = Astro.props;
+
+const bgClass = background.startsWith('cc-') ? background : '';
+const customBgStyle = !background.startsWith('cc-') ? { backgroundColor: background } : undefined;
+---
+
+<section class:list={['gallery-section', bgClass, className]} style={customBgStyle}>
+  <div class="container">
+    {
+      (title || badge) && (
+        <SectionHeading
+          badge={badge}
+          title={title || ''}
+          subtitle={subtitle}
+          colorScheme={background === 'cc-3' || background === 'cc-5' ? 'light' : 'dark'}
+          class="reveal-on-scroll"
+        />
+      )
+    }
+
+    <div class:list={['gallery-container', `layout-${layout}`, `cols-${columns}`]}>
+      {
+        images.map((img, index) => (
+          <figure
+            class="gallery-item reveal-on-scroll"
+            style={{ transitionDelay: `${index * 50}ms` }}
+          >
+            <button
+              type="button"
+              class="gallery-trigger"
+              data-lightbox-trigger
+              data-src={img.src}
+              data-alt={img.alt}
+              data-caption={img.caption || ''}
+              aria-label={`Ampliar imagem: ${img.alt}`}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                class:list={['gallery-img', img.aspectRatio ? `aspect-${img.aspectRatio}` : '']}
+                loading="lazy"
+              />
+              <span class="hover-overlay" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </span>
+            </button>
+            {img.caption && <figcaption class="gallery-caption">{img.caption}</figcaption>}
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Native HTML5 Lightbox Dialog -->
+  <dialog class="lightbox-dialog" id="gallery-lightbox">
+    <div class="dialog-inner">
+      <button
+        type="button"
+        class="lightbox-close-btn"
+        id="lightbox-close"
+        aria-label="Fechar ampliação"
+      >
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="dialog-content">
+        <img src="" alt="" id="lightbox-img" class="lightbox-image" />
+        <p id="lightbox-caption" class="lightbox-caption-text"></p>
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<script>
+  function setupLightbox() {
+    const dialog = document.getElementById('gallery-lightbox') as HTMLDialogElement | null;
+    const closeBtn = document.getElementById('lightbox-close');
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const lightboxCaption = document.getElementById('lightbox-caption');
+
+    if (!dialog || !closeBtn || !lightboxImg || !lightboxCaption) return;
+
+    document.querySelectorAll<HTMLButtonElement>('[data-lightbox-trigger]').forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const src = trigger.getAttribute('data-src') || '';
+        const alt = trigger.getAttribute('data-alt') || '';
+        const caption = trigger.getAttribute('data-caption') || '';
+
+        lightboxImg.src = src;
+        lightboxImg.alt = alt;
+        lightboxCaption.textContent = caption;
+
+        dialog.showModal();
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeLightbox() {
+      dialog?.close();
+      document.body.style.overflow = '';
+      if (lightboxImg) lightboxImg.src = '';
+    }
+
+    closeBtn.addEventListener('click', closeLightbox);
+
+    // Close when clicking dialog backdrop
+    dialog.addEventListener('click', (e) => {
+      const rect = dialog.getBoundingClientRect();
+      const isInDialog = (
+        rect.top <= e.clientY &&
+        e.clientY <= rect.top + rect.height &&
+        rect.left <= e.clientX &&
+        e.clientX <= rect.left + rect.width
+      );
+      if (!isInDialog) {
+        closeLightbox();
+      }
+    });
+
+    dialog.addEventListener('close', () => {
+      document.body.style.overflow = '';
+    });
+  }
+
+  setupLightbox();
+  document.addEventListener('astro:page-load', setupLightbox);
+</script>
+
+<style>
+  .gallery-section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+    position: relative;
+  }
+
+  .gallery-container.layout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 600px) {
+    .gallery-container.layout-grid.cols-2,
+    .gallery-container.layout-grid.cols-3,
+    .gallery-container.layout-grid.cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .gallery-container.layout-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .gallery-container.layout-grid.cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* Masonry Multi-column mode */
+  .gallery-container.layout-masonry {
+    column-count: 1;
+    column-gap: var(--space-6);
+  }
+
+  @media (min-width: 600px) {
+    .gallery-container.layout-masonry {
+      column-count: 2;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .gallery-container.layout-masonry.cols-3 {
+      column-count: 3;
+    }
+    .gallery-container.layout-masonry.cols-4 {
+      column-count: 4;
+    }
+  }
+
+  .gallery-item {
+    margin: 0;
+    break-inside: avoid;
+    margin-bottom: var(--space-6);
+  }
+
+  .gallery-trigger {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    position: relative;
+    display: block;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  }
+
+  .gallery-trigger:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--transition-slow);
+  }
+
+  .gallery-trigger:hover .gallery-img {
+    transform: scale(1.04);
+  }
+
+  .aspect-landscape {
+    aspect-ratio: 16 / 10;
+  }
+
+  .aspect-portrait {
+    aspect-ratio: 3 / 4;
+  }
+
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+
+  .hover-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(17, 75, 95, 0.45);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+  }
+
+  .gallery-trigger:hover .hover-overlay {
+    opacity: 1;
+  }
+
+  .gallery-caption {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  /* Native Dialog Lightbox */
+  .lightbox-dialog {
+    max-width: 90vw;
+    max-height: 90vh;
+    border: none;
+    border-radius: var(--radius-card);
+    padding: 0;
+    background: rgba(17, 75, 95, 0.95);
+    backdrop-filter: blur(12px);
+    color: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    margin: auto;
+  }
+
+  .lightbox-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  .dialog-inner {
+    position: relative;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lightbox-close-btn {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-fast);
+  }
+
+  .lightbox-close-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  .lightbox-image {
+    max-width: 82vw;
+    max-height: 72vh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+  }
+
+  .lightbox-caption-text {
+    margin-top: var(--space-3);
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+  }
+</style>

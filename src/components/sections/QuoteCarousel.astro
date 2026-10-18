@@ -1,0 +1,426 @@
+---
+import ShapeDivider from './ShapeDivider.astro';
+
+export interface TestimonialItem {
+  quote: string;
+  author: string;
+  role?: string;
+  avatar?: string;
+}
+
+export interface Props {
+  badge?: string;
+  title?: string;
+  testimonials: TestimonialItem[];
+  showTopShape?: boolean;
+  backgroundGradient?: string;
+  class?: string;
+}
+
+const {
+  badge = 'Depoimentos',
+  title = 'O que dizem nossos hóspedes',
+  testimonials,
+  showTopShape = true,
+  backgroundGradient = 'var(--gradient-testimonials)',
+  class: className = '',
+} = Astro.props;
+---
+
+<section
+  class:list={['quote-carousel-section', className]}
+  style={{ '--section-gradient': backgroundGradient }}
+>
+  {showTopShape && <ShapeDivider shape="wavy-hero" position="top" />}
+  <!-- Background rainy streaks -->
+  <div class="rainy-bg" aria-hidden="true">
+    <img src="/shapes/shape-rainy-10.svg" alt="" class="rainy-img" />
+  </div>
+
+  <div class="container carousel-container">
+    {
+      (title || badge) && (
+        <div class="carousel-header reveal-on-scroll">
+          {badge && <span class="carousel-badge">{badge}</span>}
+          {title && <h2 class="carousel-heading">{title}</h2>}
+        </div>
+      )
+    }
+
+    <!-- Quotes Carousel Container -->
+    <div class="quote-slider-wrapper reveal-on-scroll" data-quote-carousel>
+      <button
+        type="button"
+        class="nav-arrow nav-prev"
+        aria-label="Depoimento anterior"
+        data-action="prev"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="quote-slider" tabindex="0" aria-label="Depoimentos de hóspedes">
+        {
+          testimonials.map((item, index) => (
+            <div
+              class="quote-slide"
+              data-slide-index={index}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`Depoimento ${index + 1} de ${testimonials.length}`}
+            >
+              <div class="quote-card">
+                <!-- Quote Icon -->
+                <div class="quote-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                  </svg>
+                </div>
+
+                <blockquote class="quote-text">
+                  <p>{item.quote}</p>
+                </blockquote>
+
+                <footer class="quote-author-row">
+                  {item.avatar && (
+                    <img
+                      src={item.avatar}
+                      alt={item.author}
+                      class="author-avatar"
+                      width="54"
+                      height="54"
+                      loading="eager"
+                    />
+                  )}
+                  <div class="author-meta">
+                    <strong class="author-name">{item.author}</strong>
+                    {item.role && <span class="author-role">{item.role}</span>}
+                  </div>
+                </footer>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <button
+        type="button"
+        class="nav-arrow nav-next"
+        aria-label="Próximo depoimento"
+        data-action="next"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Indicator dots -->
+    <div class="carousel-indicators">
+      {
+        testimonials.map((_, index) => (
+          <button
+            type="button"
+            class:list={['indicator-dot', { active: index === 0 }]}
+            aria-label={`Ir para o depoimento ${index + 1}`}
+            data-dot-index={index}
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  function setupQuoteCarousels() {
+    document.querySelectorAll<HTMLElement>('[data-quote-carousel]').forEach((wrapper) => {
+      if (wrapper.dataset.carouselInit === 'true') return;
+      wrapper.dataset.carouselInit = 'true';
+
+      const slider = wrapper.querySelector<HTMLElement>('.quote-slider');
+      const prevBtn = wrapper.querySelector<HTMLButtonElement>('[data-action="prev"]');
+      const nextBtn = wrapper.querySelector<HTMLButtonElement>('[data-action="next"]');
+      const dots = wrapper.querySelectorAll<HTMLButtonElement>('[data-dot-index]');
+      const slides = wrapper.querySelectorAll<HTMLElement>('.quote-slide');
+
+      if (!slider || !slides.length) return;
+
+      function updateActiveDot(index: number) {
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+        });
+      }
+
+      function getCurrentIndex() {
+        const slideWidth = slides[0].offsetWidth || 1;
+        return Math.round(slider!.scrollLeft / slideWidth);
+      }
+
+      function scrollToIndex(index: number) {
+        let targetIndex = index;
+        if (targetIndex < 0) targetIndex = slides.length - 1;
+        if (targetIndex >= slides.length) targetIndex = 0;
+        const slideWidth = slides[0].offsetWidth;
+        slider?.scrollTo({
+          left: targetIndex * slideWidth,
+          behavior: 'smooth',
+        });
+        updateActiveDot(targetIndex);
+      }
+
+      prevBtn?.addEventListener('click', () => {
+        const curr = getCurrentIndex();
+        scrollToIndex(curr - 1);
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        const curr = getCurrentIndex();
+        scrollToIndex(curr + 1);
+      });
+
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const idx = Number(dot.getAttribute('data-dot-index'));
+          scrollToIndex(idx);
+        });
+      });
+
+      // Update dot on scroll
+      let scrollTimeout: any;
+      slider.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          updateActiveDot(getCurrentIndex());
+        }, 60);
+      });
+    });
+  }
+
+  setupQuoteCarousels();
+  document.addEventListener('astro:page-load', setupQuoteCarousels);
+</script>
+
+<style>
+  .quote-carousel-section {
+    position: relative;
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-12);
+    background: var(--section-gradient, linear-gradient(180deg, #5E9E42 0%, #00B3CC 100%));
+    color: var(--color-surface);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rainy-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.85;
+    z-index: 1;
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 15%, black 35%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 15%, black 35%);
+  }
+
+  .rainy-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .carousel-container {
+    position: relative;
+    z-index: 2;
+    max-width: 940px;
+  }
+
+  .carousel-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .carousel-badge {
+    display: inline-block;
+    padding: 0.25rem 0.85rem;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: var(--radius-pill);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: var(--space-3);
+  }
+
+  .carousel-heading {
+    font-size: var(--font-size-h2);
+    color: var(--color-surface);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .quote-slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    justify-content: center;
+  }
+
+  .quote-slider {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: var(--radius-card);
+    max-width: 720px;
+  }
+
+  .quote-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quote-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    padding: 0 var(--space-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .quote-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: var(--radius-card);
+    padding: var(--space-6) var(--space-6);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: auto 0;
+  }
+
+  @media (min-width: 768px) {
+    .quote-card {
+      padding: var(--space-8) var(--space-8);
+    }
+  }
+
+  .quote-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-secondary);
+    color: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .quote-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-style: italic;
+    color: #ffffff;
+    margin-bottom: var(--space-5);
+    white-space: pre-line;
+  }
+
+  .quote-author-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .author-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .author-meta {
+    text-align: left;
+  }
+
+  .author-name {
+    display: block;
+    font-size: var(--font-size-base);
+    color: #ffffff;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .author-role {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .nav-arrow {
+    background: #ffffff;
+    border: none;
+    color: #212529;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition-fast), background-color var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .nav-arrow:hover {
+    background: #f8f9fa;
+    transform: scale(1.08);
+  }
+
+  @media (max-width: 600px) {
+    .nav-arrow {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .carousel-indicators {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-pill);
+    border: none;
+    background-color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    padding: 0;
+  }
+
+  .indicator-dot.active {
+    background-color: #ffffff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  }
+</style>

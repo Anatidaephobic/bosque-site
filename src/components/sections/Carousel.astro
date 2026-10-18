@@ -1,0 +1,438 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface SlideImage {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+export interface Props {
+  id?: string;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  images: SlideImage[];
+  height?: string;
+  mobileHeight?: string;
+  showThumbnails?: boolean;
+  thumbnailShape?: 'rounded' | 'circle';
+  maxWidth?: string;
+  showCaptions?: boolean;
+  autoplay?: boolean;
+  class?: string;
+}
+
+const {
+  id = `carousel-${Math.random().toString(36).substring(2, 9)}`,
+  badge,
+  title,
+  subtitle,
+  images,
+  height = '520px',
+  mobileHeight = '320px',
+  showThumbnails = true,
+  thumbnailShape = 'circle',
+  maxWidth = '850px',
+  showCaptions = false,
+  autoplay = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['carousel-section', className]} id={id}>
+  {
+    (title || badge) && (
+      <div class="container">
+        <SectionHeading
+          badge={badge}
+          title={title || ''}
+          subtitle={subtitle}
+          class="reveal-on-scroll"
+        />
+      </div>
+    )
+  }
+
+  <div
+    class="carousel-viewport-wrapper reveal-on-scroll"
+    data-slideshow
+    data-autoplay={autoplay ? 'true' : 'false'}
+    style={{
+      '--carousel-max-width': maxWidth,
+    }}
+  >
+    <!-- Slides Viewport -->
+    <div
+      class="carousel-viewport"
+      style={{
+        '--carousel-height': height,
+        '--carousel-mobile-height': mobileHeight,
+      }}
+      tabindex="0"
+      role="region"
+      aria-label={title || 'Galeria de fotos'}
+    >
+      {
+        images.map((img, index) => (
+          <div
+            class="carousel-slide"
+            data-slide-index={index}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`Foto ${index + 1} de ${images.length}`}
+          >
+            <img
+              src={img.src}
+              alt={img.alt}
+              class="slide-img"
+              loading={index === 0 ? 'eager' : 'lazy'}
+            />
+            {showCaptions && img.caption && (
+              <div class="slide-caption">
+                <p>{img.caption}</p>
+              </div>
+            )}
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button
+      type="button"
+      class="carousel-btn btn-prev"
+      aria-label="Imagem anterior"
+      data-action="prev"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="carousel-btn btn-next"
+      aria-label="Próxima imagem"
+      data-action="next"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Thumbnail Bar -->
+    {
+      showThumbnails && (
+        <div
+          class:list={['thumbnails-bar', `shape-${thumbnailShape}`]}
+          role="tablist"
+          aria-label="Miniaturas da galeria"
+        >
+          {images.map((img, index) => (
+            <button
+              type="button"
+              class:list={['thumb-btn', `thumb-${thumbnailShape}`, { active: index === 0 }]}
+              aria-label={`Ver foto ${index + 1}`}
+              data-thumb-index={index}
+            >
+              <img src={img.src} alt="" class="thumb-img" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  function setupSlideshows() {
+    document.querySelectorAll('[data-slideshow]').forEach((wrapper) => {
+      const viewport = wrapper.querySelector<HTMLElement>('.carousel-viewport');
+      const prevBtn = wrapper.querySelector<HTMLButtonElement>('[data-action="prev"]');
+      const nextBtn = wrapper.querySelector<HTMLButtonElement>('[data-action="next"]');
+      const thumbs = wrapper.querySelectorAll<HTMLButtonElement>('[data-thumb-index]');
+      const slides = wrapper.querySelectorAll<HTMLElement>('.carousel-slide');
+
+      if (!viewport || !slides.length) return;
+
+      function updateActiveThumb(index: number) {
+        thumbs.forEach((th, i) => {
+          th.classList.toggle('active', i === index);
+          if (i === index) {
+            th.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
+        });
+      }
+
+      function getCurrentIndex() {
+        const slideWidth = slides[0].offsetWidth;
+        if (!slideWidth) return 0;
+        return Math.round(viewport!.scrollLeft / slideWidth);
+      }
+
+      function scrollToIndex(index: number) {
+        const targetIndex = (index + slides.length) % slides.length;
+        const slideWidth = slides[0].offsetWidth;
+        viewport?.scrollTo({
+          left: targetIndex * slideWidth,
+          behavior: 'smooth',
+        });
+        updateActiveThumb(targetIndex);
+      }
+
+      prevBtn?.addEventListener('click', () => {
+        scrollToIndex(getCurrentIndex() - 1);
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        scrollToIndex(getCurrentIndex() + 1);
+      });
+
+      thumbs.forEach((th) => {
+        th.addEventListener('click', () => {
+          const idx = Number(th.getAttribute('data-thumb-index'));
+          scrollToIndex(idx);
+        });
+      });
+
+      // Keyboard navigation (ArrowLeft / ArrowRight)
+      viewport.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          scrollToIndex(getCurrentIndex() - 1);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          scrollToIndex(getCurrentIndex() + 1);
+        }
+      });
+
+      // Update active thumbnail on manual swipe / scroll
+      let scrollTimer: any;
+      viewport.addEventListener('scroll', () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+          updateActiveThumb(getCurrentIndex());
+        }, 60);
+      });
+
+      // Autoplay support
+      if (wrapper.getAttribute('data-autoplay') === 'true') {
+        let autoplayTimer = setInterval(() => {
+          scrollToIndex(getCurrentIndex() + 1);
+        }, 5000);
+
+        wrapper.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
+        wrapper.addEventListener('mouseleave', () => {
+          clearInterval(autoplayTimer);
+          autoplayTimer = setInterval(() => {
+            scrollToIndex(getCurrentIndex() + 1);
+          }, 5000);
+        });
+      }
+    });
+  }
+
+  setupSlideshows();
+  document.addEventListener('astro:page-load', setupSlideshows);
+</script>
+
+<style>
+  .carousel-section {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-12);
+    position: relative;
+    overflow: hidden;
+    scroll-margin-top: 80px;
+    background-color: transparent;
+  }
+
+  .carousel-viewport-wrapper {
+    position: relative;
+    max-width: var(--carousel-max-width, 850px);
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+  }
+
+  .carousel-viewport {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: var(--radius-card, 14px);
+    height: var(--carousel-height, 520px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    background-color: #1c2e14;
+    outline: none;
+  }
+
+  .carousel-viewport:focus-visible {
+    box-shadow: 0 0 0 3px var(--color-primary);
+  }
+
+  .carousel-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .carousel-viewport {
+      height: var(--carousel-mobile-height, 320px);
+    }
+  }
+
+  .carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    user-select: none;
+  }
+
+  .slide-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+    color: #ffffff;
+    padding: var(--space-6) var(--space-8) var(--space-4);
+    font-size: var(--font-size-base);
+  }
+
+  .slide-caption p {
+    margin-bottom: 0;
+  }
+
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--color-pine-dark, #1c2e14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: background-color var(--transition-fast), transform var(--transition-fast), color var(--transition-fast);
+  }
+
+  @media (max-width: 768px) {
+    .carousel-btn {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .carousel-btn:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  .btn-prev {
+    left: calc(var(--container-padding) + 12px);
+  }
+
+  .btn-next {
+    right: calc(var(--container-padding) + 12px);
+  }
+
+  .thumbnails-bar {
+    display: flex;
+    gap: var(--space-2, 8px);
+    margin-top: var(--space-4);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: var(--space-2) 0;
+  }
+
+  .thumb-btn.thumb-circle {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ffffff;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    opacity: 0.6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition-fast);
+  }
+
+  @media (max-width: 768px) {
+    .thumb-btn.thumb-circle {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .thumb-btn.thumb-circle:hover {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+
+  .thumb-btn.thumb-circle.active {
+    opacity: 1;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary);
+    transform: scale(1.15);
+  }
+
+  .thumb-btn.thumb-rounded {
+    flex: 0 0 76px;
+    height: 52px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 2px solid transparent;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  @media (min-width: 768px) {
+    .thumb-btn.thumb-rounded {
+      flex: 0 0 96px;
+      height: 64px;
+    }
+  }
+
+  .thumb-btn.thumb-rounded:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  .thumb-btn.thumb-rounded.active {
+    opacity: 1;
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+  }
+
+  .thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

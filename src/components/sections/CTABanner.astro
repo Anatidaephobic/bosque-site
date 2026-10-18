@@ -1,0 +1,140 @@
+---
+import Button from '../ui/Button.astro';
+
+export interface CTA {
+  label: string;
+  href: string;
+  variant?: 'primary' | 'secondary' | 'light' | 'outline';
+  isExternal?: boolean;
+}
+
+export interface Props {
+  heading: string;
+  subheading?: string;
+  badge?: string;
+  primaryCta: CTA;
+  secondaryCta?: CTA;
+  background?: 'cc-1' | 'cc-2' | 'cc-3' | 'cc-4' | 'cc-5' | string;
+  layout?: 'split' | 'centered';
+  class?: string;
+}
+
+const {
+  heading,
+  subheading,
+  badge,
+  primaryCta,
+  secondaryCta,
+  background = 'cc-4',
+  layout = 'split',
+  class: className = '',
+} = Astro.props;
+
+const bgClass = background.startsWith('cc-') ? background : '';
+const customBgStyle = !background.startsWith('cc-') ? { backgroundColor: background } : undefined;
+---
+
+<section class:list={['cta-banner-section', bgClass, className]} style={customBgStyle}>
+  <div class="container">
+    <div class:list={['cta-banner-inner', `layout-${layout}`, 'reveal-on-scroll']}>
+      <div class="cta-text-side">
+        {badge && <span class="cta-badge">{badge}</span>}
+        <h2 class="cta-heading">{heading}</h2>
+        {subheading && <p class="cta-subheading lead">{subheading}</p>}
+      </div>
+
+      <div class="cta-actions-side">
+        <Button
+          href={primaryCta.href}
+          variant={primaryCta.variant || (background === 'cc-4' || background === 'cc-3' ? 'light' : 'primary')}
+          size="lg"
+          target={primaryCta.isExternal ? '_blank' : undefined}
+          rel={primaryCta.isExternal ? 'noopener noreferrer' : undefined}
+        >
+          {primaryCta.label}
+        </Button>
+
+        {
+          secondaryCta && (
+            <Button
+              href={secondaryCta.href}
+              variant={secondaryCta.variant || 'outline'}
+              size="lg"
+              target={secondaryCta.isExternal ? '_blank' : undefined}
+              rel={secondaryCta.isExternal ? 'noopener noreferrer' : undefined}
+            >
+              {secondaryCta.label}
+            </Button>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-banner-section {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-12);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-banner-inner.layout-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .cta-banner-inner.layout-split {
+      grid-template-columns: 1fr auto;
+      gap: var(--space-10);
+    }
+  }
+
+  .cta-banner-inner.layout-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .cta-badge {
+    display: inline-block;
+    padding: 0.25rem 0.85rem;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: var(--radius-pill);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    margin-bottom: var(--space-3);
+  }
+
+  .cta-heading {
+    font-size: var(--font-size-h2);
+    margin-bottom: var(--space-2);
+  }
+
+  .cta-subheading {
+    margin-bottom: 0;
+    opacity: 0.9;
+  }
+
+  .cta-actions-side {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .layout-centered .cta-actions-side {
+    justify-content: center;
+    margin-top: var(--space-6);
+  }
+</style>

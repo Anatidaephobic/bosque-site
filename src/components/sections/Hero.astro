@@ -1,0 +1,240 @@
+---
+import Button from '../ui/Button.astro';
+import ShapeDivider from './ShapeDivider.astro';
+
+export interface CTA {
+  label: string;
+  href: string;
+  variant?: 'primary' | 'secondary' | 'light' | 'outline';
+  isExternal?: boolean;
+}
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  badgeImage?: string;
+  letteringImage?: string;
+  bgImage?: string;
+  bgParallax?: boolean;
+  overlayGradient?: string;
+  primaryCta?: CTA;
+  secondaryCta?: CTA;
+  showBottomWave?: boolean;
+  minHeight?: string;
+  class?: string;
+}
+
+const {
+  title = 'Portal Bosque das Águas',
+  subtitle,
+  badgeImage = '/shapes/hero-badge-desktop.svg',
+  letteringImage,
+  bgImage = '/images/hero-bg-cover.jpg',
+  bgParallax = true,
+  overlayGradient = 'var(--gradient-overlay-hero)',
+  primaryCta,
+  secondaryCta,
+  showBottomWave = true,
+  minHeight = 'min(100svh, 880px)',
+  class: className = '',
+} = Astro.props;
+---
+
+<section
+  class:list={['hero-section', { 'has-parallax': bgParallax }, className]}
+  style={{
+    '--hero-min-height': minHeight,
+    '--hero-bg-image': bgImage ? `url('${bgImage}')` : 'none',
+    '--hero-overlay': overlayGradient,
+  }}
+>
+  <div class="hero-overlay"></div>
+
+  <div class="container hero-container">
+    <div class="hero-content reveal-on-scroll">
+      {
+        badgeImage && (
+          <div class="hero-badge-wrapper">
+            <img
+              src={badgeImage}
+              alt="Bosque das Águas Selo"
+              class="hero-badge"
+              width="180"
+              height="180"
+            />
+          </div>
+        )
+      }
+
+      {
+        letteringImage ? (
+          <div class="hero-lettering-wrapper">
+            <h1 class="sr-only">{title}</h1>
+            <img
+              src={letteringImage}
+              alt={title}
+              class="hero-lettering"
+              width="420"
+              height="120"
+            />
+          </div>
+        ) : (
+          <h1 class="hero-title display-2">{title}</h1>
+        )
+      }
+
+      {subtitle && <p class="hero-subtitle lead">{subtitle}</p>}
+
+      <slot />
+
+      {
+        (primaryCta || secondaryCta) && (
+          <div class="hero-actions">
+            {primaryCta && (
+              <Button
+                href={primaryCta.href}
+                variant={primaryCta.variant || 'primary'}
+                size="lg"
+                target={primaryCta.isExternal ? '_blank' : undefined}
+                rel={primaryCta.isExternal ? 'noopener noreferrer' : undefined}
+              >
+                {primaryCta.label}
+              </Button>
+            )}
+            {secondaryCta && (
+              <Button
+                href={secondaryCta.href}
+                variant={secondaryCta.variant || 'outline'}
+                size="lg"
+                target={secondaryCta.isExternal ? '_blank' : undefined}
+                rel={secondaryCta.isExternal ? 'noopener noreferrer' : undefined}
+              >
+                {secondaryCta.label}
+              </Button>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  {showBottomWave && <ShapeDivider shape="wavy-hero" position="bottom" height="110px" />}
+</section>
+
+<style>
+  .hero-section {
+    position: relative;
+    min-height: var(--hero-min-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-secondary);
+    background-image: var(--hero-bg-image);
+    background-size: cover;
+    background-position: center center;
+    color: var(--color-surface);
+    overflow: hidden;
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-26);
+  }
+
+  @media (min-width: 992px) {
+    .hero-section.has-parallax {
+      background-attachment: fixed;
+    }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--hero-overlay);
+    z-index: 1;
+  }
+
+  .hero-container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero-content {
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .hero-badge-wrapper {
+    margin-bottom: var(--space-2);
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-badge {
+    width: min(55vw, 220px);
+    height: min(55vw, 220px);
+    object-fit: contain;
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.4));
+    animation: floatBadge 8s ease-in-out infinite;
+  }
+
+  @media (min-width: 768px) {
+    .hero-badge {
+      width: 320px;
+      height: 320px;
+    }
+  }
+
+  @keyframes floatBadge {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-badge {
+      animation: none;
+    }
+  }
+
+  .hero-lettering-wrapper {
+    margin-top: -1.25rem;
+    margin-bottom: var(--space-4);
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-lettering {
+    max-width: 92vw;
+    width: min(88vw, 580px);
+    height: auto;
+    filter: drop-shadow(0 2px 10px rgba(255, 255, 255, 0.55));
+  }
+
+  .hero-title {
+    color: var(--color-surface);
+    margin-bottom: var(--space-4);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: var(--space-8);
+    max-width: 680px;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: center;
+  }
+</style>

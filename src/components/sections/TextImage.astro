@@ -1,0 +1,201 @@
+---
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface CTA {
+  label: string;
+  href: string;
+  variant?: 'primary' | 'secondary' | 'light' | 'outline';
+  isExternal?: boolean;
+}
+
+export interface Props {
+  id?: string;
+  badge?: string;
+  title: string;
+  subtitle?: string;
+  content?: string;
+  imageSrc: string;
+  imageAlt: string;
+  imagePosition?: 'left' | 'right';
+  hasShapeMask?: boolean;
+  imageStyle?: 'card' | 'thumbnail' | 'none';
+  imagePadding?: string;
+  imageLoading?: 'lazy' | 'eager';
+  background?: 'cc-1' | 'cc-2' | 'cc-3' | 'cc-4' | 'cc-5' | string;
+  cta?: CTA;
+  class?: string;
+}
+
+const {
+  id,
+  badge,
+  title,
+  subtitle,
+  content,
+  imageSrc,
+  imageAlt,
+  imagePosition = 'right',
+  hasShapeMask = false,
+  imageStyle = 'card',
+  imagePadding,
+  imageLoading = 'eager',
+  background = 'cc-1',
+  cta,
+  class: className = '',
+} = Astro.props;
+
+const bgClass = background.startsWith('cc-') ? background : '';
+const customBgStyle = !background.startsWith('cc-') ? { backgroundColor: background } : undefined;
+---
+
+<section id={id} class:list={['text-image-section', bgClass, className]} style={customBgStyle}>
+  <div class="container">
+    <div class:list={['text-image-grid', `image-${imagePosition}`]}>
+      <!-- Text Column -->
+      <div class="content-col reveal-on-scroll">
+        <SectionHeading
+          badge={badge}
+          title={title}
+          subtitle={subtitle}
+          align="left"
+          colorScheme={background === 'cc-3' || background === 'cc-5' ? 'light' : 'dark'}
+        />
+
+        {content && <div class="prose-content" set:html={content} />}
+
+        <slot />
+
+        {
+          cta && (
+            <div class="action-wrapper">
+              <Button
+                href={cta.href}
+                variant={cta.variant || (background === 'cc-3' ? 'light' : 'primary')}
+                size="md"
+                target={cta.isExternal ? '_blank' : undefined}
+                rel={cta.isExternal ? 'noopener noreferrer' : undefined}
+              >
+                {cta.label}
+              </Button>
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Image Column -->
+      <div class="image-col reveal-on-scroll">
+        <div
+          class:list={[
+            'image-wrapper',
+            `style-${imageStyle}`,
+            { 'shape-mask': hasShapeMask },
+          ]}
+          style={imagePadding ? { padding: imagePadding } : undefined}
+        >
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            class="media-image"
+            loading={imageLoading}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .text-image-section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+    position: relative;
+    overflow: hidden;
+    scroll-margin-top: 80px;
+  }
+
+  .text-image-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .text-image-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+    }
+
+    .text-image-grid.image-left {
+      grid-template-areas: "media content";
+    }
+
+    .text-image-grid.image-left .image-col {
+      grid-area: media;
+    }
+
+    .text-image-grid.image-left .content-col {
+      grid-area: content;
+    }
+  }
+
+  .content-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .prose-content {
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--space-6);
+  }
+
+  .action-wrapper {
+    margin-top: var(--space-4);
+  }
+
+  .image-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .image-wrapper {
+    width: 100%;
+    max-width: 540px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: transform var(--transition-slow), box-shadow var(--transition-slow);
+  }
+
+  .image-wrapper.style-thumbnail {
+    padding: var(--thumbnail-padding, 10px);
+    background-color: #ffffff;
+    border: 1px solid var(--color-border, #dee2e6);
+    border-radius: var(--radius-sm, 6px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .image-wrapper.style-thumbnail .media-image {
+    border-radius: 4px;
+  }
+
+  .image-wrapper.shape-mask {
+    box-shadow: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .media-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--transition-slow);
+  }
+
+  .image-wrapper:not(.shape-mask):hover .media-image {
+    transform: scale(1.02);
+  }
+</style>

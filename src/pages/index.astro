@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/sections/Hero.astro';
+import FeatureCards from '../components/sections/FeatureCards.astro';
+import MapEmbed from '../components/sections/MapEmbed.astro';
+import MasonryHighlights from '../components/sections/MasonryHighlights.astro';
+import QuoteCarousel from '../components/sections/QuoteCarousel.astro';
+import { homeData } from '../data/home';
+---
+
+<BaseLayout
+  title={homeData.meta.title}
+  description={homeData.meta.description}
+  currentPath="/"
+>
+  <Hero
+    title={homeData.hero.title}
+    subtitle={homeData.hero.subtitle}
+    badgeImage={homeData.hero.badgeImage}
+    letteringImage={homeData.hero.letteringImage}
+    bgImage={homeData.hero.bgImage}
+    bgParallax={homeData.hero.bgParallax}
+    showBottomWave={homeData.hero.showBottomWave}
+  />
+
+  <FeatureCards
+    badge={homeData.features.badge}
+    title={homeData.features.title}
+    subtitle={homeData.features.subtitle}
+    columns={homeData.features.columns}
+    background={homeData.features.background}
+    features={homeData.features.items}
+  />
+
+  <MapEmbed
+    badge={homeData.map.badge}
+    title={homeData.map.title}
+    subtitle={homeData.map.subtitle}
+    address={homeData.map.address}
+    zoom={homeData.map.zoom}
+    height={homeData.map.height}
+  />
+
+  <MasonryHighlights
+    photoSrc={homeData.masonry.photoSrc}
+    photoAlt={homeData.masonry.photoAlt}
+    cards={homeData.masonry.cards}
+    ctaText={homeData.masonry.ctaText}
+    ctaHref={homeData.masonry.ctaHref}
+  />
+
+  <QuoteCarousel
+    badge={homeData.testimonials.badge}
+    title={homeData.testimonials.title}
+    showTopShape={homeData.testimonials.showTopShape}
+    backgroundGradient={homeData.testimonials.backgroundGradient}
+    testimonials={homeData.testimonials.items}
+  />
+</BaseLayout>

@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TitleBanner from '../components/sections/TitleBanner.astro';
+import PricingBlock from '../components/sections/PricingBlock.astro';
+import { pricingContent, pricingRates } from '../data/pricing';
+---
+
+<BaseLayout
+  title={pricingContent.title}
+  description={pricingContent.description}
+  currentPath="/pricing"
+  showFooterCta={true}
+>
+  <!-- Section 1: Title Banner (s_title) -->
+  <TitleBanner
+    title={pricingContent.banner.title}
+    background={pricingContent.banner.background}
+    height={pricingContent.banner.height}
+  />
+
+  <!-- Section 2: Product Catalog / Price List (s_product_catalog) -->
+  <PricingBlock
+    badge={pricingContent.catalog.badge}
+    title={pricingContent.catalog.title}
+    subtitle={pricingContent.catalog.subtitle}
+    items={pricingRates}
+    extraNote={pricingContent.catalog.extraGuestNote}
+    footnote={pricingContent.catalog.footnote}
+    bgImage={pricingContent.catalog.bgImageDesktop}
+    bgImageMobile={pricingContent.catalog.bgImageMobile}
+    cta={pricingContent.catalog.cta}
+    secondaryCta={pricingContent.catalog.secondaryCta}
+  />
+</BaseLayout>
