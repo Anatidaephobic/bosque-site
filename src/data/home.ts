@@ -83,7 +83,7 @@ export const homeData: HomeData = {
       {
         title: 'Pousada',
         description:
-          'Casa confortável, com vista para a floresta e churrasqueira ao ar livre e utensílios de cozinha.',
+          'Casa confortável, com vista para a floresta, churrasqueira ao ar livre e utensílios de cozinha.',
         image: '/shapes/feature-bosque.svg',
       },
       {
