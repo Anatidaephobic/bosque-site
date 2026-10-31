@@ -1,0 +1,5 @@
+# Portuguese site copy: “mata” means woodland, not “meta” or “mater”.
+[default.extend-words]
+mata = "mata"
+montanha = "montanha"
+curso = "curso"

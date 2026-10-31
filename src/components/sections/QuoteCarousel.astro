@@ -6,6 +6,7 @@ export interface TestimonialItem {
   author: string;
   role?: string;
   avatar?: string;
+  source?: { label: 'Google Maps' | 'Airbnb'; url: string };
 }
 
 export interface Props {
@@ -25,6 +26,11 @@ const {
   backgroundGradient = 'var(--gradient-testimonials)',
   class: className = '',
 } = Astro.props;
+
+function getInitials(author: string) {
+  return author.trim().split(/\s+/).slice(0, 2)
+    .map((name) => Array.from(name)[0]).join('').toLocaleUpperCase('pt-BR');
+}
 ---
 
 <section
@@ -37,7 +43,7 @@ const {
     <img src="/shapes/shape-rainy-10.svg" alt="" class="rainy-img" />
   </div>
 
-  <div class="container carousel-container">
+  <div class="container carousel-container" data-quote-carousel>
     {
       (title || badge) && (
         <div class="carousel-header reveal-on-scroll">
@@ -48,7 +54,7 @@ const {
     }
 
     <!-- Quotes Carousel Container -->
-    <div class="quote-slider-wrapper reveal-on-scroll" data-quote-carousel>
+    <div class="quote-slider-wrapper reveal-on-scroll">
       <button
         type="button"
         class="nav-arrow nav-prev"
@@ -83,19 +89,28 @@ const {
                 </blockquote>
 
                 <footer class="quote-author-row">
-                  {item.avatar && (
+                  {item.avatar ? (
                     <img
                       src={item.avatar}
-                      alt={item.author}
+                      alt=""
                       class="author-avatar"
-                      width="54"
-                      height="54"
+                      width="52"
+                      height="52"
                       loading="eager"
                     />
+                  ) : (
+                    <span class="author-avatar author-avatar-placeholder" aria-hidden="true">
+                      {getInitials(item.author)}
+                    </span>
                   )}
                   <div class="author-meta">
                     <strong class="author-name">{item.author}</strong>
-                    {item.role && <span class="author-role">{item.role}</span>}
+                    <span class="author-role">{item.role ?? 'Hóspede'}</span>
+                    {item.source && (
+                      <a class="review-source" href={item.source.url} target="_blank" rel="noopener noreferrer">
+                        Avaliação no {item.source.label}
+                      </a>
+                    )}
                   </div>
                 </footer>
               </div>
@@ -124,6 +139,7 @@ const {
             type="button"
             class:list={['indicator-dot', { active: index === 0 }]}
             aria-label={`Ir para o depoimento ${index + 1}`}
+            aria-current={index === 0 ? 'true' : 'false'}
             data-dot-index={index}
           />
         ))
@@ -149,24 +165,34 @@ const {
       function updateActiveDot(index: number) {
         dots.forEach((dot, i) => {
           dot.classList.toggle('active', i === index);
+          dot.setAttribute('aria-current', String(i === index));
         });
       }
 
       function getCurrentIndex() {
-        const slideWidth = slides[0].offsetWidth || 1;
-        return Math.round(slider!.scrollLeft / slideWidth);
+        const sliderLeft = slider!.getBoundingClientRect().left;
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+        slides.forEach((slide, index) => {
+          const distance = Math.abs(slide.getBoundingClientRect().left - sliderLeft);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+          }
+        });
+        return closestIndex;
       }
 
       function scrollToIndex(index: number) {
         let targetIndex = index;
         if (targetIndex < 0) targetIndex = slides.length - 1;
         if (targetIndex >= slides.length) targetIndex = 0;
-        const slideWidth = slides[0].offsetWidth;
-        slider?.scrollTo({
-          left: targetIndex * slideWidth,
-          behavior: 'smooth',
+        const targetLeft = slides[targetIndex].getBoundingClientRect().left
+          - slider!.getBoundingClientRect().left + slider!.scrollLeft;
+        slider!.scrollTo({
+          left: targetLeft,
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
         });
-        updateActiveDot(targetIndex);
       }
 
       prevBtn?.addEventListener('click', () => {
@@ -186,14 +212,31 @@ const {
         });
       });
 
-      // Update dot on scroll
-      let scrollTimeout: any;
-      slider.addEventListener('scroll', () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          updateActiveDot(getCurrentIndex());
-        }, 60);
+      slider.addEventListener('keydown', (event) => {
+        const targets: Record<string, number> = {
+          ArrowLeft: getCurrentIndex() - 1,
+          ArrowRight: getCurrentIndex() + 1,
+          Home: 0,
+          End: slides.length - 1,
+        };
+        if (!(event.key in targets)) return;
+        event.preventDefault();
+        scrollToIndex(targets[event.key]);
       });
+
+      // Use the visible slide as the source of truth, including touch/trackpad scrolling.
+      let framePending = false;
+      const syncActiveDot = () => {
+        if (framePending) return;
+        framePending = true;
+        requestAnimationFrame(() => {
+          updateActiveDot(getCurrentIndex());
+          framePending = false;
+        });
+      };
+      slider.addEventListener('scroll', syncActiveDot, { passive: true });
+      new ResizeObserver(syncActiveDot).observe(slider);
+      updateActiveDot(getCurrentIndex());
     });
   }
 
@@ -272,6 +315,7 @@ const {
 
   .quote-slider {
     flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     align-items: center;
     overflow-x: auto;
@@ -304,7 +348,6 @@ const {
     border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: var(--radius-card);
     padding: var(--space-6) var(--space-6);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -344,18 +387,32 @@ const {
     display: flex;
     align-items: center;
     gap: var(--space-4);
+    max-width: 100%;
   }
 
   .author-avatar {
     width: 52px;
     height: 52px;
+    flex-shrink: 0;
     border-radius: var(--radius-pill);
     object-fit: cover;
     border: 2px solid #ffffff;
     box-shadow: var(--shadow-sm);
   }
 
+  .author-avatar-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-secondary);
+    color: #ffffff;
+    font-weight: var(--font-weight-semibold);
+    font-size: 1rem;
+  }
+
   .author-meta {
+    min-width: 0;
+    overflow-wrap: anywhere;
     text-align: left;
   }
 
@@ -370,6 +427,14 @@ const {
     display: block;
     font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.85);
+  }
+
+  .review-source {
+    display: block;
+    color: #ffffff;
+    font-size: var(--font-size-xs);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .nav-arrow {
@@ -394,6 +459,14 @@ const {
   }
 
   @media (max-width: 600px) {
+    .quote-author-row {
+      flex-direction: column;
+    }
+
+    .author-meta {
+      text-align: center;
+    }
+
     .nav-arrow {
       width: 36px;
       height: 36px;

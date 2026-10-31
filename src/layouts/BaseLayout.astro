@@ -34,7 +34,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://bosqueda
     <link rel="canonical" href={canonicalURL} />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=bosque" sizes="16x16 32x32 48x48 64x64" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=bosque" sizes="any" />
 
     <!-- Google Fonts: Poppins (300, 400, 600) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

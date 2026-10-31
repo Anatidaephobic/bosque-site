@@ -52,6 +52,16 @@ export interface HomeData {
   };
 }
 
+// Reviews checked against the public listings in Zen. Quotes preserve the guests' wording.
+const airbnbReviewSource = {
+  label: 'Airbnb',
+  url: 'https://www.airbnb.com.br/rooms/54122360/reviews',
+} as const;
+const googleReviewSource = {
+  label: 'Google Maps',
+  url: 'https://www.google.com/maps/place/Bosque+das+%C3%81guas/@-29.7539699,-50.2993841,17z/data=!4m2!3m1!1s0x9518618b2ca09927:0xf8eecee2d281d5c5',
+} as const;
+
 export const homeData: HomeData = {
   meta: {
     title: 'Home | Bosque das Águas',
@@ -145,22 +155,61 @@ export const homeData: HomeData = {
     backgroundGradient: 'linear-gradient(180deg, #5E9E42 0%, #00B3CC 100%)',
     items: [
       {
-        author: 'Martin • Hóspede',
+        author: 'Martin',
         quote:
           'Lugar perfeito pra se conectar consigo mesmo, é um dreno de estresse pois saimos de la muito renovados! além de lindo o local é bem caprichado e o José é uma pessoa muito bacana e solicita! certamente vale muito a pena a experiência!',
         avatar: '/images/testimonial-martin.jpg',
+        source: airbnbReviewSource,
       },
       {
-        author: 'Ana Silvia • Hóspede',
+        author: 'Ana Silvia',
         quote:
           'Lugar de natureza exuberante, casa confortável, rio de água fresca e límpida , mata densa, plantas, animais e café da manhã com produtos coloniais deliciosos e frescos.\n\nO Zé foi um super anfitrião, disponível para atender todas as necessidades, deu dicas de lugares para conhecer nas redondezas e nos brindou com algumas surpresas.\n\nOs vagalumes, grilos e cigarras anunciavam as noites e fomos surpreendidos com um luau regado de estrelas e música boa de violão tocado por ele.',
         avatar: '/images/testimonial-carolina.jpg',
+        source: airbnbReviewSource,
       },
       {
-        author: 'Ana • Hóspede',
+        author: 'Ana',
         quote:
           'Casal anfitrião, Jose Luiz e Ana foram maravilhosos, gentis, prestativos, muito simpáticos. O chalé muito acolhedor, limpissimo e muito bem equipado.\n\nA cesta do café da manhã maravilhosa ( pago parte) valor super em conta, com muitas iguarias, frutas variadas, cafezinho passado hora, nos deixando com vontade de "quero mais".\n\nSuper recomendo, lugar lindo, aconchegante e bem perto Poa/RS.',
         avatar: '/images/testimonial-viviane.png',
+        source: airbnbReviewSource,
+      },
+      {
+        author: 'Dilermando',
+        quote:
+          'José e Ana nos receberam e trataram super bem.\nÉ um belo espaço, extremamente aconchegante, limpo e organizado. Não falta nada.\nRecomendamos, e retornaremos com certeza.',
+        source: airbnbReviewSource,
+      },
+      {
+        author: 'Vinícius Camargo Pasquoto',
+        quote:
+          'Tudo estava perfeito, José e Ana são muito queridos e atenciosos, a casa é aconchegante e estava impecável, perfeito para quem gosta de natureza e deseja um lugar tranquilo para descansar. Adoramos que a guia canina Luna nos levou para conhecer o rio.',
+        source: airbnbReviewSource,
+      },
+      {
+        author: 'Jéssica',
+        quote:
+          'Acomodação muito aconchegante, limpa, organizada e encantadora em cada detalhe da decoração.\nOs anfitriões são muito atenciosos e percebe-se que administram o local com muita dedicação e carinho.\nO café da manhã com produtos locais é excelente! O pão, os bolinhos de frutas, o doce de leite e o queijo são maravilhosos!!!\nFoi possível descansar e também aproveitar o Fervedor, que é de fácil acesso e fica muito próximo da cabana.\nCertamente indicaremos o local e voltaremos em outra oportunidade!',
+        source: airbnbReviewSource,
+      },
+      {
+        author: 'Guilherme Santos (Gacs94)',
+        quote:
+          'Lugar maravilhoso!!! Já foi várias vezes no meu aniversário e vou para esse local toda vez que quero fugir da agitação da cidade. Recomendo muito otimo lugar.',
+        source: googleReviewSource,
+      },
+      {
+        author: 'George Gregis',
+        quote:
+          'Bom atendimento desde a reserva, casal proprietários muito simpáticos.\nLocal de muita harmonia. higiene,ótimo café colonial.cahoeiras e Rio a disposição. Em breve voltarei',
+        source: googleReviewSource,
+      },
+      {
+        author: 'Mano Gomes',
+        quote:
+          'Uma experiência maravilhosa ! Muito limpo, organizando e aconchegante. Anfitriões prestativos e muito amáveis!',
+        source: googleReviewSource,
       },
     ],
   },

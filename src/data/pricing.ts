@@ -33,12 +33,6 @@ export interface PricingPageContent {
       variant?: 'primary' | 'secondary' | 'light' | 'outline';
       isExternal?: boolean;
     };
-    secondaryCta: {
-      label: string;
-      href: string;
-      variant?: 'primary' | 'secondary' | 'light' | 'outline';
-      isExternal?: boolean;
-    };
   };
 }
 
@@ -53,21 +47,27 @@ export const pricingRates: PriceRate[] = [
     price: 'R$350/dia',
   },
   {
-    id: 'saturday',
-    title: 'Sábado',
+    id: 'friday',
+    title: 'Sexta-feira',
     price: 'R$400/dia',
   },
   {
-    id: 'sunday-holidays',
-    title: 'Domingos e feriados',
+    id: 'saturday',
+    title: 'Sábado e Domingo',
     price: 'R$450/dia',
+  },
+  {
+    id: 'holidays',
+    title: 'Feriados',
+    price: 'A combinar',
+    note: 'Valores variam conforme as datas.',
   },
 ];
 
 export const pricingContent: PricingPageContent = {
   title: 'Preços | Bosque das Águas',
   description:
-    'Consulte as diárias e valores do Bosque das Águas em Caraá, RS: dias de semana, sábados, domingos e feriados, além de eventos especiais.',
+    'Consulte as diárias do Bosque das Águas em Caraá, RS: segunda a quinta, sexta-feira, sábado e domingo. Feriados têm valores a combinar, conforme as datas.',
   banner: {
     title: 'Preços',
     background: 'cc-3',
@@ -76,19 +76,13 @@ export const pricingContent: PricingPageContent = {
   catalog: {
     rates: pricingRates,
     extraGuestNote: '+ R$50,00 para cada hóspede adicional, até o máximo de 5 pessoas',
-    footnote: 'Consultar disponibilidade para eventos.',
+    footnote: 'Feriados têm valores a combinar, conforme as datas. Consulte também a disponibilidade para eventos.',
     bgImageDesktop: '/images/pricing-bg-desktop.jpg',
     bgImageMobile: '/images/pricing-bg-mobile.jpg',
     cta: {
       label: 'Reservar pelo WhatsApp',
       href: siteConfig.bookingUrl,
       variant: 'primary',
-      isExternal: true,
-    },
-    secondaryCta: {
-      label: 'Ver no Airbnb',
-      href: siteConfig.airbnbUrl,
-      variant: 'light',
       isExternal: true,
     },
   },

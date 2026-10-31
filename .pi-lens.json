@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/apmantza/pi-lens/master/docs/schema/pi-lens-config-v1.json",
+  "lsp": {
+    "servers": {
+      "astro": {
+        "name": "Astro Language Server",
+        "extensions": [
+          ".astro"
+        ],
+        "command": "./node_modules/.bin/astro-ls",
+        "args": ["--stdio"],
+        "rootMarkers": [
+          "tsconfig.json",
+          "package.json"
+        ],
+        "initializationOptions": {
+          "typescript": {
+            "tsdk": "./node_modules/typescript/lib"
+          }
+        }
+      }
+    }
+  },
+  "rules": {
+    "find-import-file-without-extension": {
+      "ignorePaths": [
+        "src/**/*.ts"
+      ]
+    },
+    "no-shape-in-symbol-names": {
+      "ignorePaths": [
+        "src/data/*.ts"
+      ]
+    }
+  }
+}

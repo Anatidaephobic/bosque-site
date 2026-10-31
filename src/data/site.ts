@@ -7,7 +7,7 @@ export interface NavItem {
 export interface SocialLink {
   name: string;
   url: string;
-  icon: 'whatsapp' | 'instagram' | 'airbnb' | 'phone' | 'email' | 'map';
+  icon: 'whatsapp' | 'instagram' | 'phone' | 'email' | 'map';
   ariaLabel: string;
 }
 
@@ -17,7 +17,6 @@ export interface ContactInfo {
   phone: string;
   phoneRaw: string;
   whatsappUrl: string;
-  airbnbUrl: string;
 }
 
 export interface SiteConfig {
@@ -32,8 +31,7 @@ export interface SiteConfig {
     height: number;
   };
   nav: NavItem[];
-  bookingUrl: string; // WhatsApp primary booking
-  airbnbUrl: string;  // Airbnb secondary booking
+  bookingUrl: string; // Direct booking via WhatsApp
   contact: ContactInfo;
   socials: SocialLink[];
   footer: {
@@ -42,8 +40,6 @@ export interface SiteConfig {
       subheading: string;
       buttonText: string;
       buttonUrl: string;
-      secondaryButtonText?: string;
-      secondaryButtonUrl?: string;
     };
     copyrightNotice: string;
   };
@@ -67,14 +63,12 @@ export const siteConfig: SiteConfig = {
     { label: 'Preços', href: '/pricing' },
   ],
   bookingUrl: 'https://wa.me/5551984224804',
-  airbnbUrl: 'https://www.airbnb.com.br/rooms/54122360',
   contact: {
     address: 'Travessa Um, Estrada Alberto Alminhana, 3833 • Vila Fraga, Caraá • RS, 95515-000',
     email: 'portalbosque.dasaguas@gmail.com',
     phone: '+55 (51) 98422-4804',
     phoneRaw: '+5551984224804',
     whatsappUrl: 'https://wa.me/5551984224804',
-    airbnbUrl: 'https://www.airbnb.com.br/rooms/54122360',
   },
   socials: [
     {
@@ -89,12 +83,6 @@ export const siteConfig: SiteConfig = {
       icon: 'instagram',
       ariaLabel: 'Siga o Bosque das Águas no Instagram',
     },
-    {
-      name: 'Airbnb',
-      url: 'https://www.airbnb.com.br/rooms/54122360',
-      icon: 'airbnb',
-      ariaLabel: 'Reserve nossa cabana no Airbnb',
-    },
   ],
   footer: {
     cta: {
@@ -102,8 +90,6 @@ export const siteConfig: SiteConfig = {
       subheading: 'Venha ter experiências junto à natureza, desfrutando os viveres e os sabores da terra!',
       buttonText: 'Fazer Reserva',
       buttonUrl: 'https://wa.me/5551984224804',
-      secondaryButtonText: 'Ver no Airbnb',
-      secondaryButtonUrl: 'https://www.airbnb.com.br/rooms/54122360',
     },
     copyrightNotice: `© ${new Date().getFullYear()} Bosque das Águas. Todos os direitos reservados.`,
   },
