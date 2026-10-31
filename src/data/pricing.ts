@@ -43,7 +43,7 @@ export interface PricingPageContent {
 export const pricingRates: PriceRate[] = [
   {
     id: 'weekdays',
-    title: 'De segunda a quinta',
+    title: 'De domingo a quinta',
     price: 'R$350/dia',
   },
   {
@@ -53,7 +53,7 @@ export const pricingRates: PriceRate[] = [
   },
   {
     id: 'saturday',
-    title: 'Sábado e Domingo',
+    title: 'Sábado',
     price: 'R$450/dia',
   },
   {
