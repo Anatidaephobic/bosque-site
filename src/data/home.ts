@@ -141,7 +141,7 @@ export const homeData: HomeData = {
       {
         title: 'As Trilhas',
         description:
-          'As terras da região proporcionam inúmeras oportunidades de trilha e exploração, de inúmeras distâncias e dificuldades.',
+          'A região oferece caminhos diversificados em dificuldade, distância e atrativos.',
         colorScheme: 'cc-2',
       },
     ],

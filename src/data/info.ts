@@ -67,7 +67,7 @@ export const infoPageData: InfoPageData = {
   cabinSection: {
     title: 'A Casa do Bosque',
     content:
-      '<p>A cabana foi construída em madeira e pedra, com arquitetura rústica e aconchegante. Possui dois andares, com sala, cozinha e banheiro no primeiro andar, e quarto no segundo andar.</p><p>No térreo temos uma área externa coberta com churrasqueira e mesa para refeições ao ar livre.</p>',
+      '<p>A cabana foi construída em madeira e pedra, com arquitetura rústica e aconchegante. Possui dois andares, com sala, cozinha e banheiro no primeiro andar, e quarto e varanda coberta ao ar livre no segundo andar.</p><p>No térreo temos uma área externa coberta e um espaço aberto para churrasco e fogueira.</p>',
     imageSrc: '/images/casa-do-bosque-facade.jpeg',
     imageAlt: 'Fachada da Casa do Bosque com deck e cercada pela mata atlântica',
     imagePosition: 'right',
